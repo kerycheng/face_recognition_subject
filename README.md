@@ -1,18 +1,18 @@
+<h1>大學專題:人臉辨識</h1>
 
 
 
-
-  	┬data┬cv2  <br>
-	│    ├dataset<br>
-	│    ├facenet<br>
-	│    ├haar<br>
-	│    ├mtcnn<br>
-	│    ├recognizer<br>
-	│    ├serializer<br>
-	│    ├uploadedimages<br>
-	│    ├detect_face<br>
-	│    ├facenet<br>
-	│    └visualization_utils<br>
+  	┬data┬cv2  
+	│    ├dataset
+	│    ├facenet
+	│    ├haar
+	│    ├mtcnn
+	│    ├recognizer
+	│    ├serializer
+	│    ├uploadedimages
+	│    ├detect_face
+	│    ├facenet
+	│    └visualization_utils
 	│
 	├faceRecog┬__init__.py
 	│         ├cascade.py
