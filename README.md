@@ -2,17 +2,17 @@
 
 
 
-  ┬data┬cv2
-	│    ├dataset
-	│    ├facenet
-	│    ├haar
-	│    ├mtcnn
-	│    ├recognizer
-	│    ├serializer
-	│    ├uploadedimages
-	│    ├detect_face
-	│    ├facenet
-	│    └visualization_utils
+  	┬data┬cv2  <br>
+	│    ├dataset<br>
+	│    ├facenet<br>
+	│    ├haar<br>
+	│    ├mtcnn<br>
+	│    ├recognizer<br>
+	│    ├serializer<br>
+	│    ├uploadedimages<br>
+	│    ├detect_face<br>
+	│    ├facenet<br>
+	│    └visualization_utils<br>
 	│
 	├faceRecog┬__init__.py
 	│         ├cascade.py
