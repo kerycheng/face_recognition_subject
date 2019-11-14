@@ -1,7 +1,5 @@
 from .settings import BASE_DIR
 from django.shortcuts import render, redirect
-import warnings
-warnings.filterwarnings('ignore')
 
 import os
 import re
@@ -9,30 +7,34 @@ import cv2
 import sys
 import copy
 import math
+import time
 import base64
 import pickle
 import random
 import logging
+import imutils
+import argparse
 import numpy as np
-import tensorflow as tf
-import matplotlib.pyplot as plt
-
-
-
 from PIL import Image
 from time import time
 from tqdm import tqdm
 from scipy import misc
+import tensorflow as tf
 from data import facenet
 from sklearn.svm import SVC
 from data import detect_face
-from . import cascade as casc
+from keras.layers import Dense
+import matplotlib.pyplot as plt
+from keras.datasets import mnist
+from keras.utils import np_utils
 from . import dataset_fetch as df
 from sklearn.svm import LinearSVC
 from os.path import join as pjoin
+from records.models import Records
 from scipy.spatial import distance
+from keras.models import Sequential
 from sklearn.externals import joblib
-from sklearn.decomposition import PCA
+from imutils.video import VideoStream
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import GridSearchCV
 from data import visualization_utils as vis_utils
@@ -46,24 +48,54 @@ def errorImg(request):
     return render(request, 'error.html')
 
 def create_dataset(request):
+    Already_used_img = cv2.imread(BASE_DIR + '/static/img/Already_used.jpg')
+    
     # 接收POST
-    userId = request.POST['userId']
-    print (cv2.__version__)
+    id = request.POST['userId']
+    
+        #-------------------自動註冊用戶表單--------------------#
+    if request.method == "POST": # 如果是以POST的方式才處理
+        try:
+            id = request.POST['userId']
+            first_name = 'first_name_' + request.POST['userId']    # 自動儲存流水資料
+            last_name = 'last_name_' + request.POST['userId']
+            address = 'address' + request.POST['userId']
+            grade = 'grade' + request.POST['userId']
+            Department = 'Department' + request.POST['userId']
+            Picture = '/static/img/user.' + request.POST['userId'] + '.10.jpg' # 彩圖位置
+            Introduction = request.POST['userId']
+            unit = Records.objects.create(id = id,
+                                          first_name=first_name,
+                                          last_name=last_name,
+                                          address=address,
+                                          grade=grade,
+                                          Picture=Picture,
+                                          Department=Department,
+                                          Introduction=Introduction) 
+            unit.save()
+        except:
+            print("此ID已被使用")
+            cv2.imshow('Already_used', Already_used_img)
+            cv2.waitKey(2000)
+            cv2.destroyAllWindows()
+            return redirect('/')
+ 
     
     # 人臉偵測
     # 選擇haar
-    faceDetect = cv2.CascadeClassifier(BASE_DIR+'/data/haar/haarcascade_frontalface_default.xml')
+    faceDetect = cv2.CascadeClassifier(BASE_DIR+'/data/haar/haarcascade_frontalface_alt2.xml')
     
     cam = cv2.VideoCapture(0)
-
-    id = userId
     
     # 建立userId資料夾
     face_dir = BASE_DIR+'/data/dataset/user'+str(id)
-    os.makedirs(face_dir)
+    
+    if not os.path.exists(face_dir):
+        os.makedirs(face_dir)
     
 
     sampleNum = 0
+    saveNum = 0
     
     #----------------攝像頭捕捉人像-----------------#
     
@@ -75,14 +107,18 @@ def create_dataset(request):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # 儲存人臉
-        faces = faceDetect.detectMultiScale(gray, 1.3, 6)
+        faces = faceDetect.detectMultiScale(gray, 1.3, 7)
 
         for(x,y,w,h) in faces:
 
             # 每獲取一張人臉都會儲存成一張jpg檔，並標上序號
+            saveNum = saveNum+1
             sampleNum = sampleNum+1
             
-            # 儲存的人臉會直接裁切保存到前面建立的userId資料夾
+            if(saveNum==10):
+                cv2.imwrite(BASE_DIR+'/static/img/user.'+str(id)+'.'+str(saveNum)+'.jpg', img) # 儲存彩圖
+                
+            # 儲存的人臉會直接裁切保存到前面建立的userId資料夾   
             cv2.imwrite(BASE_DIR+'/data/dataset/user'+str(id)+'/user.'+str(id)+'.'+str(sampleNum)+'.jpg', gray[y:y+h,x:x+w])
             
             # 起始點 (x, y)
@@ -100,16 +136,48 @@ def create_dataset(request):
         # Debug
         cv2.waitKey(100)
 
-        # 當拍攝到15張時關閉程式
-        if(sampleNum>14):
+        # 當拍攝到22張時關閉程式
+        if(sampleNum>21):
             break
             
     cam.release()
     cv2.destroyAllWindows()
+    
+    
+    return redirect('/trainer_camera') # 返回頁面
 
+def user_information(request,id=None):
+    
+    OK_img = cv2.imread(BASE_DIR + '/static/img/OK.jpg')
+    NO_img = cv2.imread(BASE_DIR + '/static/img/NO.jpg')
+    
+    id = request.POST['id']
+        
+    if request.method == "POST": 
+        try:
+            unit = Records.objects.get(id = id)  #取得要修改的資料紀錄
+            unit.first_name = request.POST['first_name']    #取得表單輸入資料
+            unit.last_name = request.POST['last_name']
+            unit.address = request.POST['address']
+            unit.grade = request.POST['grade']
+            unit.Department = request.POST['Department']
+            unit.Introduction = request.POST['Introduction']
+        except:
+            print("查無此ID，請重新輸入")
+            cv2.imshow('Failed',NO_img)
+            cv2.waitKey(2000)
+            cv2.destroyAllWindows()
+        else:
+            unit.save() 
+            print("資料修改成功")
+            cv2.imshow('Successful',OK_img)
+            cv2.waitKey(2000)
+            cv2.destroyAllWindows()
+        
     return redirect('/')
 
-def trainer(request):
+
+def trainer_camera(request):
 
     #-------------載入相關模型--------------#
     
@@ -172,8 +240,8 @@ def detect(request):
     
     #-----------------載入相關模型-------------------#
     
-    faceDetect = cv2.CascadeClassifier(BASE_DIR+'/data/haar/haarcascade_frontalface_default.xml')
-
+    faceDetect = cv2.CascadeClassifier(BASE_DIR+'/data/haar/haarcascade_frontalface_alt2.xml')
+    
     cam = cv2.VideoCapture(0)
     # creating recognizer
     rec = cv2.face.LBPHFaceRecognizer_create();
@@ -219,7 +287,7 @@ def detect(request):
     cv2.destroyAllWindows()
     return redirect('/')
 
-def eigenTrain(request):
+def trainer_photo(request):
     DATA_PATH = os.path.join(BASE_DIR, "data") #data目錄
 
     FACENET_DATA_PATH = os.path.join(DATA_PATH, "facenet","20180402-114759","20180402-114759.pb") #dacenet路徑
@@ -240,8 +308,8 @@ def eigenTrain(request):
             #print (paths) #test
             #print (labels) #test
             #print (labels_dict) #test
-            #print('Origin: Number of classes: %d' % len(labels_dict)) #人臉種類
-            #print('Origin: Number of images: %d' % len(paths)) #人臉總數
+            print('Origin: Number of classes: %d' % len(labels_dict)) #人臉種類
+            print('Origin: Number of images: %d' % len(paths)) #人臉總數
             
             #------------載入Facenet模型------------#
             modeldir =  FACENET_DATA_PATH
@@ -254,15 +322,15 @@ def eigenTrain(request):
 
             #------------計算人臉特徵向量------------#
             batch_size = 3 # 一次輸入的樣本數量
-            image_size = 160  # 要做為Facenet的圖像輸入的大小
-
-            nrof_images = len(paths) # 總共要處理的人臉圖像
+            image_size = 160  # 要做為Facenet的圖像輸入的大小            
+            times_pohto = 10.0  # 每張照片看的次數
+            nrof_images = len(paths) # 總共要處理的人臉圖像 
             # 計算總共要跑的批次數
-            nrof_batches_per_epoch = int(math.ceil(2.0 * nrof_images / batch_size))
+            nrof_batches_per_epoch = int(math.ceil(times_pohto * nrof_images / batch_size))
             # 構建一個變數來保存"人臉特徵向量"
             emb_array = np.zeros((nrof_images, embedding_size)) # <-- Face Embedding
 
-            for i in tqdm(range(nrof_batches_per_epoch)):
+            for i in tqdm(range(nrof_batches_per_epoch)): # 實際訓練 facenet
                 start_index = i * batch_size
                 end_index = min((i + 1) * batch_size, nrof_images)
                 paths_batch = paths[start_index:end_index]
@@ -293,7 +361,7 @@ def eigenTrain(request):
     # 人臉特徵
     with open(os.path.join(DATA_PATH+'/recognizer', 'lfw_emb_features.pkl'), 'rb') as emb_features_file:
         emb_features =pickle.load(emb_features_file)
-        #print(emb_features) #test
+        print(emb_features) #test
 
     # 矩陣
     with open(os.path.join(DATA_PATH+'/recognizer', 'lfw_emb_labels.pkl'), 'rb') as emb_lables_file:
@@ -342,10 +410,16 @@ def eigenTrain(request):
 
     # 訓練分類器
     print('Training classifier')
-    linearsvc_classifier = LinearSVC(C=1, multi_class='ovr')
+    linearsvc_classifier = LinearSVC(C=1, multi_class='crammer_singer')
 
     # 進行訓練
     linearsvc_classifier.fit(X_train, y_train)
+    
+    # 使用驗證資料集來檢查準確率
+    score = linearsvc_classifier.score(X_test, y_test)
+
+    # 打印分類器的準確率
+    print("Validation result: ", score)
     
 
 
@@ -364,6 +438,7 @@ def eigenTrain(request):
     
     return redirect('/')
 
+face_id_name = ''
 
 def detectImage(request):  
     userImage = request.FILES['userImage']
@@ -414,7 +489,7 @@ def detectImage(request):
 
 
 
-    def is_same_person(face_emb, face_label, threshold=1.1):
+    def is_same_person(face_emb, face_label, threshold = 1.1):
         emb_distances = []
         emb_features = emb_dict[face_label]
         for i in range(len(emb_features)):
@@ -442,7 +517,7 @@ def detectImage(request):
 
     # 創建Tensorflow Graph物件
     tf.reset_default_graph()
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=1.0) # 將GPU的顯存設為60%
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8) # 將GPU的顯存設為60%
 
     # 創建Tensorflow Session物件
     tf_sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, log_device_placement=False)) # False 不打印設備分配紀錄
@@ -479,7 +554,7 @@ def detectImage(request):
 
         print('load classifier file-> %s' % classifier_filename)
         #測試是否成功載入
-        print(face_svc_classifier)    
+        # print(face_svc_classifier)
     
     #-----------------------開始辨識---------------------------# 
         
@@ -553,7 +628,7 @@ def detectImage(request):
             face_id_idx = face_svc_classifier.predict(emb_array) 
             print(face_id_idx)
 
-            if is_same_person(emb_array, int(face_id_idx), 0.7):            
+            if is_same_person(emb_array, int(face_id_idx), 0.7):
                 face_id_name = HumanNames[int(face_id_idx)] # 取出人臉的名字
             else:
                 print("No face detected, or image not recognized")
