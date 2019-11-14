@@ -13,7 +13,7 @@ class Records(models.Model):
     address = models.CharField('住址', max_length=50, null=True)
     grade = models.CharField('年級', max_length=150, null=True)
     Department = models.CharField('系所', max_length=150, null=True)
-    Picture = models.ImageField('個人圖片', upload_to='', default='', blank=True)
+    Picture = models.ImageField('個人圖片', upload_to='', blank=True)
     Introduction = models.TextField('個人介紹')
     recorded_at = models.DateTimeField('資料儲存時間',default=datetime.now, blank=True)
 
