@@ -95,7 +95,7 @@
                 <div class="col-md-6">
                     <form id="target" action="detect_image" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <label for="file-input" style="cursor:pointer" data-toggle="modal" data-target="#myModal-3">上傳圖片</label>
+                        <label for="file-input" style="margin: 0px -50px 0px 140px;" data-toggle="modal" data-target="#myModal-3">上傳圖片</label>
                         <input id="file-input" name="userImage" type="file" style="display: none;" accept="image/*" />
                     </form>
                     <script>
@@ -104,14 +104,8 @@
                         });
 
                     </script>
-                </div>
-                <div class="col-md-6">
-                    <a href="trainer_photo">
-                        <button type="button" data-toggle="modal" data-target="#myModal-2">
-                            <h4 class="text-center">訓練資料集</h4>
-                        </button>
-                    </a>
-                </div>
+           </div>
+
             </div>
             <div class="col-md-7">
                 <h3 class="text-center">攝像頭辨識</h3>
@@ -126,12 +120,13 @@
                         <button type="button" data-toggle="modal" data-target="#myModal-1">
                             <h4 class="text-center">修改個人資料</h4>
                         </button>
-                    </a>
                 </div>
                 <div class="col-md-4">
-                    <button type="button" data-toggle="modal" data-target="#myModal">
-                        <h4 class="text-center">建立人臉資料</h4>
-                    </button>
+                    <a href="/create_dataset/">
+                        <button type="button" data-toggle="modal" data-target="#myModal">
+                            <h4 class="text-center">建立人臉資料</h4>
+                        </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -147,7 +142,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">請輸入ID並等待開啟攝像頭</h4>
+                    <h4 class="modal-title" id="myModalLabel">等待開啟攝像頭</h4>
                 </div>
                 <div class="modal-body">
                     <ul>
@@ -158,15 +153,7 @@
                         <li>拍攝期間請保持同樣姿勢，以獲得較好的照片資源
                         <li>
                     </ul>
-                    <hr />
-                    <form action="/create_dataset/" method="POST">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="inputId">請輸入ID</label>
-                            <input type="text" class="form-control" name="userId" id="inputId" placeholder="Enter Id">
-                        </div>
-                        <button type="submit" class="btn btn-warning">送出</button>
-                    </form>
+                    <hr/>
                 </div>
             </div>
         </div>
