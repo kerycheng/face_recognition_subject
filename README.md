@@ -41,15 +41,10 @@
 	
 ====================================
 
-將下列檔案下載並依照上面路徑檔分別放入
-
-MTCNN https://reurl.cc/L14YN7
-
-haar https://reurl.cc/ObGdVr
+將下方檔案下載並依照上面路徑檔放入
 
 facenet https://reurl.cc/nVrk7X
 
-cv2 https://reurl.cc/727ORQ
 
 ====================================
 
