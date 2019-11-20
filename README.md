@@ -68,7 +68,7 @@ Tensorflow-gpu 1.14.0
 
 Numpy 1.16.2
 
-
+Python 3.6.8
 
 
 
