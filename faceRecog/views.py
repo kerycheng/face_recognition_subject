@@ -8,6 +8,7 @@ import sys
 import copy
 import math
 import time
+import json
 import base64
 import pickle
 import random
@@ -50,20 +51,51 @@ def errorImg(request):
 def create_dataset(request):
     Already_used_img = cv2.imread(BASE_DIR + '/static/img/Already_used.jpg')
     
-    # 接收POST
-    id = request.POST['userId']
+    
+    #--------------------讀取使用者號碼------------------#
+    try:
+        user = open(BASE_DIR + '/data/user_Num.txt', 'r+')
+
+        lines = user.readlines() #str
+
+        last_line = lines[-1]
+
+        print("讀取到的最後一筆號碼是：" + last_line)   #讀取最後一筆資料
+
+        user_Num = last_line #重新命名方便做使用
+
+
+        int_Num = int(user_Num) #轉成int
+        int_Num = int_Num + 1 #讀取 + 1
+        str_Num = str(int_Num) #轉成str
+
+
+        new_user_Num = str_Num #重新命名方便做使用
+
+        print("這次儲存的號碼是：" + new_user_Num)
+
+
+        user.write('\n'+str_Num) #儲存
+
+        user.close()
+    
+    except:
+        print('error')
+        return redirect('/')
+    
+    
+    id = new_user_Num
+
     
         #-------------------自動註冊用戶表單--------------------#
-    if request.method == "POST": # 如果是以POST的方式才處理
-        try:
-            id = request.POST['userId']
-            first_name = 'first_name_' + request.POST['userId']    # 自動儲存流水資料
-            last_name = 'last_name_' + request.POST['userId']
-            address = 'address' + request.POST['userId']
-            grade = 'grade' + request.POST['userId']
-            Department = 'Department' + request.POST['userId']
-            Picture = '/static/img/user.' + request.POST['userId'] + '.10.jpg' # 彩圖位置
-            Introduction = request.POST['userId']
+    try:
+            first_name = 'first_name_' + id    # 自動儲存流水資料
+            last_name = 'last_name_' + id
+            address = 'address' + id
+            grade = 'grade' + id
+            Department = 'Department' + id
+            Picture = '/static/img/user.' + id + '.10.jpg' # 彩圖位置
+            Introduction = id
             unit = Records.objects.create(id = id,
                                           first_name=first_name,
                                           last_name=last_name,
@@ -73,7 +105,7 @@ def create_dataset(request):
                                           Department=Department,
                                           Introduction=Introduction) 
             unit.save()
-        except:
+    except:
             print("此ID已被使用")
             cv2.imshow('Already_used', Already_used_img)
             cv2.waitKey(2000)
@@ -233,7 +265,7 @@ def trainer_camera(request):
     recognizer.save(BASE_DIR+'/data/recognizer/trainingData.yml')
     cv2.destroyAllWindows()
 
-    return redirect('/')
+    return redirect('/trainer_photo')
 
 
 def detect(request):
@@ -361,23 +393,20 @@ def trainer_photo(request):
     # 人臉特徵
     with open(os.path.join(DATA_PATH+'/recognizer', 'lfw_emb_features.pkl'), 'rb') as emb_features_file:
         emb_features =pickle.load(emb_features_file)
-        print(emb_features) #test
 
-    # 矩陣
+    # 每一張的人臉標籤
     with open(os.path.join(DATA_PATH+'/recognizer', 'lfw_emb_labels.pkl'), 'rb') as emb_lables_file:
         emb_labels =pickle.load(emb_lables_file)
-        #print(emb_labels) #test
 
-    # user_ids
+    # 總共的人臉標籤種類
     with open(os.path.join(DATA_PATH+'/recognizer', 'lfw_emb_labels_dict.pkl'), 'rb') as emb_lables_dict_file:
         emb_labels_dict =pickle.load(emb_lables_dict_file)
-        #print(emb_labels_dict) #test
         
     #-------------------測試--------------------#    
     
-    print("人臉embedding featues: {}, shape: {}, type: {}".format(len(emb_features), emb_features.shape, type(emb_features)))
-    print("人臉embedding labels: {}, type: {}".format(len(emb_labels), type(emb_labels)))
-    print("人臉embedding labels dict: {}, type: {}", len(emb_labels_dict), type(emb_labels_dict))
+    print("人臉特徵數量: {}, shape: {}, type: {}".format(len(emb_features), emb_features.shape, type(emb_features)))
+    print("人臉標籤數量: {}, type: {}".format(len(emb_labels), type(emb_labels)))
+    print("人臉標籤種類: {}, type: {}", len(emb_labels_dict), type(emb_labels_dict))
 
     
     #-------------------準備相關變數-----------------#
@@ -414,14 +443,6 @@ def trainer_photo(request):
 
     # 進行訓練
     linearsvc_classifier.fit(X_train, y_train)
-    
-    # 使用驗證資料集來檢查準確率
-    score = linearsvc_classifier.score(X_test, y_test)
-
-    # 打印分類器的準確率
-    print("Validation result: ", score)
-    
-
 
     classifier_filename = SVM_DATA_PATH
 
