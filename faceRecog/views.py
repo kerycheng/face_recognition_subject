@@ -9,6 +9,7 @@ import copy
 import math
 import time
 import json
+import shutil
 import base64
 import pickle
 import random
@@ -178,12 +179,42 @@ def create_dataset(request):
     
     return redirect('/trainer_camera') # 返回頁面
 
+def delete_user(request,id=None):                  #刪除資料
+    
+    OK_img = cv2.imread(BASE_DIR + '/static/img/OK.jpg')
+    NO_img = cv2.imread(BASE_DIR + '/static/img/NO.jpg')
+    
+    id = request.POST['id']
+    print(id)
+    if request.method == "POST":
+        try:
+            unit = Records.objects.get(id=id)  #取得id欄位的資料
+            unit.delete()                      #刪除資料       
+            delDir = BASE_DIR + "/data/dataset/user" + str(id)
+            print(delDir)
+            shutil.rmtree(delDir)
+        except:
+            message = "查無此ID，請重新輸入"
+            cv2.imshow('Failed',NO_img)
+            cv2.waitKey(2000)
+            cv2.destroyAllWindows()
+        else:
+            unit.save() 
+            print("資料修改成功")
+            cv2.imshow('Successful',OK_img)
+            cv2.waitKey(2000)
+            cv2.destroyAllWindows()
+            return redirect('/trainer_camera/')
+            
+    return redirect('/')
+
 def user_information(request,id=None):
     
     OK_img = cv2.imread(BASE_DIR + '/static/img/OK.jpg')
     NO_img = cv2.imread(BASE_DIR + '/static/img/NO.jpg')
     
     id = request.POST['id']
+    print(id)
         
     if request.method == "POST": 
         try:
@@ -291,7 +322,7 @@ def detect(request):
     while(True):
         ret, img = cam.read() # 讀取攝像頭
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = faceDetect.detectMultiScale(gray, 1.3, 5)
+        faces = faceDetect.detectMultiScale(gray, 1.3, 3)
         for(x,y,w,h) in faces:
             cv2.rectangle(img,(x,y),(x+w,y+h), (0,255,0), 2)
 
@@ -354,7 +385,7 @@ def trainer_photo(request):
 
             #------------計算人臉特徵向量------------#
             batch_size = 3 # 一次輸入的樣本數量
-            image_size = 160  # 要做為Facenet的圖像輸入的大小            
+            image_size = 150  # 要做為Facenet的圖像輸入的大小            
             times_pohto = 10.0  # 每張照片看的次數
             nrof_images = len(paths) # 總共要處理的人臉圖像 
             # 計算總共要跑的批次數

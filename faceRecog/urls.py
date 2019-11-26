@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^error_image/$', app_views.errorImg),
     url(r'^create_dataset/$', app_views.create_dataset),
     url(r'^user_information/$', app_views.user_information),
+    url(r'^delete_user/$', app_views.delete_user),
     url(r'^trainer_camera/$', app_views.trainer_camera),
     url(r'^trainer_photo/$', app_views.trainer_photo),
     url(r'^detect/$', app_views.detect),
