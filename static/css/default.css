@@ -331,6 +331,7 @@
 	
 	#logo h1
 	{
+        margin-top: 10px;
 		color: #FFF;
 	}
 	
@@ -552,16 +553,39 @@
 	{
 		overflow: hidden;
 		padding: 5em 0em;
+        padding-bottom: 0px;
 	}
+	
+	#extra .user
+	{
+        float: right;
+		width: 400px;
+		height: 461px;
+		border-left-width: 50px;    
+	}
+
+    #extra .recognition
+    {
+        float: left;
+        width: 400px;
+        height: 461px;
+        border-left-width: 50px;
+    }
+
+    #extra .photo .title
+    {
+        margin-top: 5em;
+    }
 	
 	#extra .title
 	{
 		text-align: center;
+        margin-bottom: 0em;
 	}
 	
 	#extra .button
 	{
-		margin-top: 5em;
+		margin-top: 3em;
 	}
 	
 	#extra .fa
@@ -570,7 +594,159 @@
 		margin-bottom: 0.5em;
 		text-align: center;
 		font-size: 3em;
+    }
+
+/*********************************************************************************/
+/* introduction                                                                  */
+/*********************************************************************************/
+
+    #introduction
+    {
+        display: flex;   
+    }
+
+    #introduction .photo-area
+    {
+        padding-right: 40px;
+    }
+    
+    #introduction .intro-area
+    {
+
+    }
+
+    #introduction .photo
+    {
+    	width: 200px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 0, 0, 0);        
+    }
+    
+/*********************************************************************************/
+/* hr                                                                            */
+/*********************************************************************************/
+
+    #hr
+    {
+        width: 100%;
+        margin: 60px 0px;
+    }
+
+    #hr .hr-dots
+    {
+        height: 6px;
+        margin: 0 auto 40px;
+        text-align: center;
+        line-height: 0;
+    }
+
+    #hr .hr-dots span
+    {
+        color: #7b6852;
+        background: #7b6852;
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        overflow: hidden;
+        margin: 0 5px;
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+/*********************************************************************************/
+/* beginning                                                                     */
+/*********************************************************************************/
+
+    #beginning .title
+    {
+        margin-bottom: 30px;
+        text-align:center
+    }
+
+    #beginning .photo-right
+    {
+        text-align: center;
+    }
+
+    #beginning .photo-left
+    {
+        text-align: center;
+    }
+
+    #beginning .content
+    {
+        position: relative;
+        min-height: 1px;
+        padding: 0px 100px;
+    }
+    
+    #beginning .photo
+    {
+        display: flex;
+    }
+
+    #beginning .right
+    {
+        height: 200px;
+        padding: 0px 100px;
+    }
+
+    #beginning .left
+    {
+        height: 200px;
+        padding: 0px 100px;
+    }
+
+    #beginning .left-content
+    {
+        margin-top: 10px;
+    }
+
+    #beginning .right-content
+    {
+        margin-top: 10px;
+    }
+
+/*********************************************************************************/
+/* use                                                                           */
+/*********************************************************************************/
+
+    #use .title
+    {
+    margin-bottom: 30px;   
+    }
+
+    #use .content
+    {
+        position: relative;
+        min-height: 1px;
+        padding: 0px 100px;  
+    }
+
+    #use .photo
+    {
+        position: relative;
+    }
+
+    #use .use-photo
+    {
+        display: block;
+        margin: auto;
+        width: 800px;
+        height: 450px;
+        padding: 15px 0px;
+    }
+/*********************************************************************************/
+/* footer                                                                        */
+/*********************************************************************************/
+
+	#footer-wrapper
+	{
+		background: #333333;
 	}
 
-
-
+	#footer
+	{
+		position: relative;
+		padding: 3em 0em;
+	}
