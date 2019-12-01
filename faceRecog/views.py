@@ -48,6 +48,10 @@ def index(request):
     return render(request, 'index.html')
 def errorImg(request):
     return render(request, 'error.html')
+def about_us(request):
+    return render(request, 'about_us.html')
+def about_object(request):
+    return render(request, 'about_object.html')
 
 def create_dataset(request):
     Already_used_img = cv2.imread(BASE_DIR + '/static/img/Already_used.jpg')
@@ -169,8 +173,8 @@ def create_dataset(request):
         # Debug
         cv2.waitKey(100)
 
-        # 當拍攝到22張時關閉程式
-        if(sampleNum>21):
+        # 當拍攝到15張時關閉程式
+        if(sampleNum>14):
             break
             
     cam.release()
@@ -385,14 +389,14 @@ def trainer_photo(request):
 
             #------------計算人臉特徵向量------------#
             batch_size = 3 # 一次輸入的樣本數量
-            image_size = 150  # 要做為Facenet的圖像輸入的大小            
+            image_size = 140  # 要做為Facenet的圖像輸入的大小            
             times_pohto = 10.0  # 每張照片看的次數
             nrof_images = len(paths) # 總共要處理的人臉圖像 
             # 計算總共要跑的批次數
             nrof_batches_per_epoch = int(math.ceil(times_pohto * nrof_images / batch_size))
             # 構建一個變數來保存"人臉特徵向量"
             emb_array = np.zeros((nrof_images, embedding_size)) # <-- Face Embedding
-
+            
             for i in tqdm(range(nrof_batches_per_epoch)): # 實際訓練 facenet
                 start_index = i * batch_size
                 end_index = min((i + 1) * batch_size, nrof_images)
@@ -400,7 +404,8 @@ def trainer_photo(request):
                 images = facenet.load_data(paths_batch, False, False, image_size)
                 feed_dict = {images_placeholder: images, phase_train_placeholder: False}
                 emb_array[start_index:end_index, :] = sess.run(embeddings, feed_dict=feed_dict)
- 
+           
+
 
     #--------------保存facenet.pkl-------------#          
     # 人臉特徵

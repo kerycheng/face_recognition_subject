@@ -19,14 +19,16 @@ from faceRecog import views as app_views
 
 urlpatterns = [
     url(r'^$', app_views.index),
-    url(r'^error_image/$', app_views.errorImg),
-    url(r'^create_dataset/$', app_views.create_dataset),
-    url(r'^user_information/$', app_views.user_information),
-    url(r'^delete_user/$', app_views.delete_user),
-    url(r'^trainer_camera/$', app_views.trainer_camera),
-    url(r'^trainer_photo/$', app_views.trainer_photo),
+    url(r'^about_us/', app_views.about_us),
+    url(r'^about_object/', app_views.about_object),
     url(r'^detect/$', app_views.detect),
+    url(r'^error_image/$', app_views.errorImg),
+    url(r'^delete_user/$', app_views.delete_user),
     url(r'^detect_image$', app_views.detectImage),
+    url(r'^trainer_photo/$', app_views.trainer_photo),
+    url(r'^create_dataset/$', app_views.create_dataset),
+    url(r'^trainer_camera/$', app_views.trainer_camera),
+    url(r'^user_information/$', app_views.user_information),    
     url(r'^admin/', admin.site.urls),
     url(r'^records/', include('records.urls')),
 ]
