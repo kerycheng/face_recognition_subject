@@ -388,7 +388,7 @@ def trainer_photo(request):
             embedding_size = embeddings.get_shape()[1]
 
             #------------計算人臉特徵向量------------#
-            batch_size = 3 # 一次輸入的樣本數量
+            batch_size = 5 # 一次輸入的樣本數量
             image_size = 140  # 要做為Facenet的圖像輸入的大小            
             times_pohto = 10.0  # 每張照片看的次數
             nrof_images = len(paths) # 總共要處理的人臉圖像 
@@ -618,6 +618,7 @@ def detectImage(request):
     print('Start Recognition!')
     
     im = Image.open(userImage)
+    im = im.convert("RGB")
     #im.show()
     imgPath = BASE_DIR+'/data/uploadedImages/'+str(userImage)
     im.save(imgPath, 'JPEG')
@@ -685,7 +686,7 @@ def detectImage(request):
             face_id_idx = face_svc_classifier.predict(emb_array) 
             print(face_id_idx)
 
-            if is_same_person(emb_array, int(face_id_idx), 0.7):
+            if is_same_person(emb_array, int(face_id_idx), 1.0):
                 face_id_name = HumanNames[int(face_id_idx)] # 取出人臉的名字
             else:
                 print("No face detected, or image not recognized")
