@@ -38,13 +38,13 @@
             <div class="title"><h2>使用者專區</h2></div>
             <ul class="actions">
                 <li>
-                    <a href="/create_dataset" class="button" data-toggle="modal" data-target="#myModal-0">建立人臉資料</a>
+                    <a href="/create_dataset/" class="button" data-toggle="modal" data-target="#myModal-0">建立人臉資料</a>
                 </li>
                 <li>
-                    <a href="/user_information" class="button" data-toggle="modal" data-target="#myModal-1">修改個人資料</a>
+                    <a href="/user_information/" class="button" data-toggle="modal" data-target="#myModal-1">修改個人資料</a>
                 </li>
                 <li>
-                    <a href="/delete_user" class="button" data-toggle="modal" data-target="#myModal-2">刪除人臉資料</a>
+                    <a href="/delete_user/" class="button" data-toggle="modal" data-target="#myModal-2">刪除人臉資料</a>
                 </li>
             </ul>
         </div>
@@ -55,7 +55,7 @@
                 </div>
                 <ul class="actions">
                     <li>
-                        <a href="/detect" class="button">即時辨識</a>
+                        <a href="/detect/" class="button">即時辨識</a>
                     </li>
                 </ul>
             </div>
@@ -65,7 +65,7 @@
                 </div>
                 <ul class="actions">
                     <li>
-                        <form id="target" action="/detect_image" method="POST" enctype="multipart/form-data">
+                        <form id="target" action="/detect_image/" method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <label for="file-input" class="button" data-toggle="modal" data-target="#myModal-3">上傳圖片</label>
                             <input id="file-input" name="userImage" type="file" style="display: none;" accept="image/*" />
@@ -116,7 +116,7 @@
                 <h4 class="modal-title" id="myModalLabel" align="center">修改個人資料</h4>
             </div>
             <div class="modal-body">
-                <form action="/user_information" method="POST">
+                <form action="/user_information/" method="POST">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="inputId">請輸入ID</label>
@@ -161,7 +161,7 @@
                 <ul>
                     <li>刪除個人資料後會重新整理資料集，請稍等</li>
                 </ul>
-                <form action="/delete_user" method="POST">
+                <form action="/delete_user/" method="POST">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="inputId">請輸入ID</label>
